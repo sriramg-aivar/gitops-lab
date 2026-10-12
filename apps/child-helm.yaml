@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: child-helm
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sriramg-aivar/gitops-lab.git
+    targetRevision: HEAD
+    path: helm-app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: child-helm
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
