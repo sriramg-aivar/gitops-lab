@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: spec-tour-
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: who
+        value: world
+  parallelism: 2
+  activeDeadlineSeconds: 300
+  ttlStrategy:
+    secondsAfterCompletion: 600
+  podGC:
+    strategy: OnWorkflowCompletion
+  onExit: cleanup
+  templates:
+    - name: main
+      steps:
+        - - name: hello
+            template: say
+            arguments:
+              parameters: [{name: msg, value: "hello {{workflow.parameters.who}}"}]
+        - - name: flaky
+            template: flaky
+    - name: say
+      inputs:
+        parameters:
+          - name: msg
+      container:
+        image: alpine:3.19
+        command: [echo, "{{inputs.parameters.msg}}"]
+    - name: flaky
+      retryStrategy:
+        limit: 3
+      container:
+        image: alpine:3.19
+        command: [sh, -c, "if [ $((RANDOM % 2)) -eq 0 ]; then echo ok; else echo fail; exit 1; fi"]
+    - name: cleanup
+      container:
+        image: alpine:3.19
+        command: [echo, "exit handler ran, status {{workflow.status}}"]

@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterWorkflowTemplate
+metadata:
+  name: cluster-shared
+spec:
+  templates:
+    - name: hello
+      container:
+        image: alpine:3.19
+        command: [echo, "from a cluster-wide template"]

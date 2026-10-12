@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kustomize-dev
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sriramg-aivar/gitops-lab.git
+    targetRevision: HEAD
+    path: kustomize-app/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kz-dev
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true

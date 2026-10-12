@@ -1,0 +1,15 @@
+data:
+  service.webhook.local: |
+    url: http://echo:8080
+    headers:
+    - name: Content-Type
+      value: application/json
+  template.app-synced: |
+    webhook:
+      local:
+        method: POST
+        body: |
+          {"app":"{{.app.metadata.name}}","sync":"{{.app.status.sync.status}}","health":"{{.app.status.health.status}}"}
+  trigger.on-synced: |
+    - when: app.status.sync.status == 'Synced'
+      send: [app-synced]
